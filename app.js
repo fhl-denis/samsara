@@ -1,4 +1,4 @@
-// pasci sagt: hoi denis
+// so, gahts äch jez?
 /*
 	samsara
 	index
