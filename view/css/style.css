@@ -1,0 +1,20 @@
+header img {
+	position: absolute;
+	right: 30px;
+	top: 30px;
+	border: 15px solid #ECEFF1;
+}
+
+header {
+	position: relative;
+}
+
+#controls {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	background: white;
+	border: 1px solid #DDDDDD;
+	padding-left: 30px;
+	padding-right: 30px;
+}

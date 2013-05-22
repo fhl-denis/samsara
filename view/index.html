@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>samsara</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" type="text/css" href="<%= baseUrl %>/public/css/bootstrap.css"/>
+		<link rel="stylesheet" type="text/css" href="<%= baseUrl %>/public/css/flat-ui.css"/>
+		<link rel="stylesheet" type="text/css" href="<%= baseUrl %>/public/css/style.css"/>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/underscore-min.js"></script>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/backbone-min.js"></script>
+		<script type="text/javascript">
+			var baseUrl = "<%= baseUrl %>";
+		</script>
+	</head>
+	<body>
+		<header class="container">
+				<h1 class="demo-logo">samsara<small>indirect gaming study</small></h1>
+		</header>
+		<section class="container" id="main">
+			<canvas id="game-view" height="400" width="400"></canvas>
+		</section>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/httpbb.js"></script>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/game.js"></script>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/test.js"></script>
+		<script type="text/javascript" src="<%= baseUrl %>/public/js/main.js"></script>
+	</body>
+</html>
