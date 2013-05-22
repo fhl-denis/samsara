@@ -40,7 +40,7 @@ var Game = function(canvas, ctx, loads, updates, draws, options) {
 	this.updates = updates;
 
 	// draw objects
-	_.each(updates, function(value, key) {
+	_.each(draws, function(value, key) {
 		if (!_.isObject(value)) {
 			throw new Exception();
 		}
@@ -121,7 +121,11 @@ Game.prototype.update = function(dt) {
 
 */
 Game.prototype.draw = function() {
+	var that = this;
+
+	// clear the drawing area
+	that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
 	_.each(this.draws, function(dObject, index) {
-		dObject.draw(this.canvas, this.ctx);
+		dObject.draw(that.canvas, that.ctx);
 	});
 };
