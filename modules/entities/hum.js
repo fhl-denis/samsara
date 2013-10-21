@@ -3,44 +3,63 @@ var _ = require('underscore');
 
 var Hum = function() {
 	this.objectType = 'Hum';
-	this.coords = new entity.Coords(0, 0);
-	this.size = new entity.Size(50, 50);
-	//this.collisionInfo = new CollisionInfo('player', {});
+	this.collisionInfo = new entity.CollisionInfo('soft', {});
+	this.bb = new entity.BoundingBox(390, 170, 20, 30);
+	this.speed = new entity.Speed(0, 0);
+};
 
-	this.bb = new entity.BoundingBox(this);
+Hum.prototype.resolveCollision = function() {
+	var that = this;
+	_.each(this.collisionInfo.colliders, function(entity) {
+		if (entity.collisionInfo.type == 'hard'){
+			that.pushBackCollision(entity.bb);
+		}
+	});
+	this.collisionInfo.colliders = [];
+};
 
-	this.speed = 200;
-	this.moveTo = new entity.Coords(100, 100);
+Hum.prototype.pushBackCollision = function(bb) {
+	var top, bottom, left, right;
+
+	top = Math.abs(this.bb.coords.y - bb.getC().y);
+	bottom = Math.abs(this.bb.getC().y - bb.coords.y);
+	left = Math.abs(this.bb.coords.x - bb.getC().x);
+	right = Math.abs(this.bb.getC().x - bb.coords.x);
+
+	if (top < bottom && top < left && top < right) {
+		this.speed.v = 0; this.bb.coords.y = bb.getC().y;
+	}
+
+	if (bottom < top && bottom < left && bottom < right) {
+		this.speed.v = 0; this.bb.coords.y = bb.coords.y - this.bb.size.h;
+	}
+
+	if (left < top && left < bottom && left < right) {
+		this.speed.x = 0; this.bb.coords.x = bb.getC().x;
+	}
+
+	if (right < top && right < bottom && right < left){
+		this.speed.x = 0; this.bb.coords.x = bb.coords.x - this.bb.size.w;
+	}
+};
+
+Hum.prototype.gravitate = function() {
+	if (this.speed.h < 30){
+		this.speed.h += 5;
+	}
+	else {
+		this.speed.h = 30;
+	}
 };
 
 Hum.prototype.move = function(dt) {
-	var dx = this.moveTo.x - this.coords.x,
-		dy = this.moveTo.y - this.coords.y,
-		d0, scale, rx, ry, actualSpeed;
-
-	if (dx == 0 && dy == 0){
-		console.log('no move');
-		return;
-	}
-
-	d0 = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-	actualSpeed = this.speed * dt / 1000;
-	if (d0 <= actualSpeed){
-		console.log(d0);
-		this.coords.x = this.moveTo.x;
-		this.coords.y = this.moveTo.y;
-		return;
-	}
-
-	rx = actualSpeed * dx / d0;
-	ry = actualSpeed * dy / d0;
-
-	this.coords.x += rx;
-	this.coords.y += ry;
-	console.log(this);
+	this.bb.coords.x += this.speed.v * dt / 1000;
+	this.bb.coords.y += this.speed.h * dt / 1000;
 };
 
 Hum.prototype.update = function(dt) {
+	this.gravitate();
 	this.move(dt);
+	this.resolveCollision();
 };
 exports.Hum = Hum;

@@ -1,8 +1,11 @@
 var _ = require('underscore');
 
-var player = {};
+var player = false;
 
 exports.read = function(input) {
+	if (!player){
+		return;
+	}
 	// do sth with input
 	console.log(input);
 	player.moveTo = {

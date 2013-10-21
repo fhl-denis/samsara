@@ -25,7 +25,7 @@ var socketGo = function () {
 var canvas = document.getElementById('game-view');
 if (canvas.getContext){
 	var ctx = canvas.getContext('2d');
-	var game = new Game(canvas, ctx, socketGo(), {Hum: Hum});
+	var game = new Game(canvas, ctx, socketGo(), {Hum: Hum, Block: Block});
 	game.start();
 }
 else {

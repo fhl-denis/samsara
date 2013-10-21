@@ -10,17 +10,21 @@ var Size = function(w, h) {
 	this.h = h;
 };
 
+var Speed = function(v, h) {
+	this.v = v;
+	this.h = h;
+};
+
 var CollisionInfo = function(type, attributes) {
 	this.type = type;
 	this.attributes = attributes;
+	this.colliders = [];
 };
 
 // Axis aligned Bounding Boxes
-var BoundingBox = function(args) {
-	this.size = args.size;
-	this.coords = args.coords;
-	this.collisionInfo = args.collisionInfo;
-	this.collisionResolvers = args.collisionResolvers;
+var BoundingBox = function(x, y, w, h) {
+	this.coords = new Coords(x, y);
+	this.size = new Size(w, h);
 };
 
 BoundingBox.prototype.getA = function() {
@@ -43,14 +47,8 @@ BoundingBox.prototype.getM = function() {
 	return {x: this.coords.x + this.size.w / 2, y: this.coords.y + this.size.h / 2};
 };
 
-BoundingBox.prototype.resolveCollision = function(box) {
-	if (_.isFunction(this.collisionResolvers[box.collisionInfo.type])){
-		this.collisionResolvers[type](box.collisionInfo.attributes);
-	}
-};
-
-var Collider = function(boxes) {
-	this.boxes = boxes;
+var Collider = function(entities) {
+	this.entities = entities;
 };
 
 Collider.prototype.isColliding = function(bb1, bb2) {
@@ -67,14 +65,14 @@ Collider.prototype.isColliding = function(bb1, bb2) {
 
 Collider.prototype.checkCollisions = function() {
 	var that = this,
-		restBoxes = {};
+		restEntities = this.entities;
 
-	_.each(this.boxes, function(box, name) {
-		restBoxes = _.omit(restBoxes, name);
-		_.each(restBoxes, function(rBox, rName) {
-			if (that.isColliding(box, rBox)) {
-				box.resolveCollision(rBox);
-				rBox.resolveCollision(box);
+	_.each(this.entities, function(entity, name) {
+		restEntities = _.omit(restEntities, name);
+		_.each(restEntities, function(rEnt, rName) {
+			if (that.isColliding(entity.bb, rEnt.bb)) {
+				entity.collisionInfo.colliders.push(rEnt);
+				rEnt.collisionInfo.colliders.push(entity);
 			}
 		});
 	});
@@ -84,4 +82,5 @@ exports.Collider = Collider;
 exports.BoundingBox = BoundingBox;
 exports.Coords = Coords;
 exports.Size = Size;
+exports.Speed = Speed;
 exports.CollisionInfo = CollisionInfo;

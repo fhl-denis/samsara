@@ -3,6 +3,7 @@ var userInput = require('./userInput.js');
 var loop = require('./loop.js');
 
 var Hum = require('./../entities/hum.js').Hum;
+var Block = require('./../entities/block.js').Block;
 
 var responses = {
 	error: function(c) {
@@ -54,13 +55,12 @@ exports.start = function(wsServer) {
 
     var loopOptions = {};
     var hum = new Hum;
-	loop.start({hum: hum}, loopOptions, function(updated) {
+    var block = new Block;
+	loop.start({hum: hum, block: block}, loopOptions, function(updated) {
 		_.each(connections, function(connection) {
 			connection.send(JSON.stringify(updated));
 		});
 	});
-
-	userInput.setPlayer(hum);
 
 	wsServer.on('request', function(request) {
 	    var connection = request.accept(null, request.origin);

@@ -9,6 +9,10 @@ header {
 	position: relative;
 }
 
+canvas {
+	border: 5px solid #DDDDDD;
+}
+
 #controls {
 	position: fixed;
 	bottom: 0;
