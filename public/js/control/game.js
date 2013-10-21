@@ -11,41 +11,24 @@
 		- fps = frames/second defaults to 60
 */
 
-var Game = function(canvas, ctx, loads, updates, draws, options) {
+var Game = function(canvas, ctx, connection, objectTypes, options) {
 
 	// settings
 	var defaults = {
-		fps: 60
+		
 	};
 	this.settings = _.extend(defaults, options);
+
+	// socket
+	this.connection = connection;
 
 	// html 5 canvas element object
 	this.canvas = canvas;
 	this.ctx = ctx;
 
-	// load objects
-	_.each(loads, function(value, key) {
-		if (!_.isObject(value)) {
-			throw new Exception();
-		}
-	});
-	this.loads = loads;
-
-	// update objects
-	_.each(updates, function(value, key) {
-		if (!_.isObject(value)) {
-			throw new Exception();
-		}
-	});
-	this.updates = updates;
-
-	// draw objects
-	_.each(draws, function(value, key) {
-		if (!_.isObject(value)) {
-			throw new Exception();
-		}
-	});
-	this.draws = draws;
+	// entities
+	this.objects = {};
+	this.objectTypes = objectTypes;
 };
 
 
@@ -56,19 +39,25 @@ var Game = function(canvas, ctx, loads, updates, draws, options) {
 */
 Game.prototype.start = function() {
 
-	// calculate the delta time
-	// each update object gets a reference to delta time
-	var dt = 1000/this.settings.fps;
+	var that = this;
 
 	// start the update/draw loop after load
-	var that = this;
-	that.load(function() {
-		setInterval(function() {
-			that.update(dt);
-			that.draw();
-		}, dt);
-	});
-	
+	this.connection.onmessage = function (message) {
+        // try to decode json (I assume that each message from server is json)
+        try {
+            var json = JSON.parse(message.data);
+        } catch (e) {
+            console.log('This doesn\'t look like a valid JSON: ', message.data);
+            return;
+        }
+        // handle incoming message
+        if (json && json != "ok") {
+        	that.update(json);
+        	that.draw();
+        }
+    };
+
+    this.userInput();
 };
 
 /*
@@ -105,9 +94,21 @@ Game.prototype.load = function(ready) {
 	and passes it to the updatable objects.
 
 */
-Game.prototype.update = function(dt) {
-	_.each(this.updates, function(uObject, index) {
-		uObject.update(dt);
+Game.prototype.update = function(objects) {
+	var that = this;
+
+	_.each(objects, function(uObject, name) {
+		if (_.isUndefined(that.objectTypes[uObject.objectType])) {
+			console.log(that.objectTypes);
+			throw 'not implemented objectType';
+		}
+		if (_.isObject(that.objects[name])) {
+			that.objects[name].update(uObject);
+		}
+		else {
+			console.log(name + ': ' + 'new ' + uObject.objectType);
+			that.objects[name] = new that.objectTypes[uObject.objectType](uObject);
+		}
 	});
 };
 
@@ -125,7 +126,31 @@ Game.prototype.draw = function() {
 
 	// clear the drawing area
 	that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
-	_.each(this.draws, function(dObject, index) {
+	_.each(that.objects, function(dObject, index) {
 		dObject.draw(that.canvas, that.ctx);
 	});
+};
+
+Game.prototype.userInput = function() {
+	var that = this;
+
+	var getMousePos = function(canvas, evt) {
+		var rect = canvas.getBoundingClientRect();
+		return {
+			x: evt.clientX - rect.left,
+			y: evt.clientY - rect.top
+		};
+	}
+
+	canvas.addEventListener('click', function(evt) {
+		var mousePos = getMousePos(that.canvas, evt);
+		var message = 'Mouse position: ' + mousePos.x + ', ' + mousePos.y;
+		console.log(message);
+		that.connection.send(JSON.stringify({
+			h: "userInput",
+			c: {
+				click: mousePos
+			}
+		}));
+	}, false);
 };
