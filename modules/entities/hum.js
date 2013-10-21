@@ -28,8 +28,6 @@ Hum.prototype.pushBackCollision = function(bb) {
 	left = Math.abs(this.bb.coords.x - bb.getC().x);
 	right = Math.abs(this.bb.getC().x - bb.coords.x);
 
-	this.grounded = false;
-
 	if (top < bottom && top < left && top < right) {
 		this.speed.v = 0; this.bb.coords.y = bb.getC().y;
 	}
@@ -65,9 +63,12 @@ Hum.prototype.decide = function() {
 	}
 
 	if (!this.grounded){
-		console.log('flaying');
 		this.speed.h = 0;
 	}
+};
+
+Hum.prototype.init = function() {
+	this.grounded = false;
 };
 
 Hum.prototype.gravitate = function() {
@@ -85,6 +86,7 @@ Hum.prototype.move = function(dt) {
 };
 
 Hum.prototype.update = function(dt) {
+	this.init();
 	this.gravitate();
 	this.move(dt);
 	this.resolveCollision();
