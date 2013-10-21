@@ -2,9 +2,12 @@ var _ = require('underscore');
 var Collider = require('./../entities/entity.js').Collider;
 
 var loop = function(objects, dt) {
-	_.each(objects, function(obj) {
+	var updated = {};
+	_.each(objects, function(obj, key) {
 		obj.update(dt);
+		updated[key] = _.omit(obj, 'collisionInfo');
 	});
+	return updated;
 };
 
 exports.start = function(objects, options, fn) {
@@ -15,7 +18,6 @@ exports.start = function(objects, options, fn) {
 	var collider = new Collider(objects);
 	setInterval(function() {
 		collider.checkCollisions();
-		loop(objects, settings.dt);
-		fn(objects);
+		fn(loop(objects, settings.dt));
 	}, settings.dt);
 };

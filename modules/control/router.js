@@ -55,8 +55,10 @@ exports.start = function(wsServer) {
 
     var loopOptions = {};
     var hum = new Hum;
-    var block = new Block;
-	loop.start({hum: hum, block: block}, loopOptions, function(updated) {
+    var blockB = new Block(0, 290, 800, 10);
+    var blockL = new Block(0, 0, 10, 290);
+    var blockR = new Block(790, 0, 10, 290);
+	loop.start({hum: hum, blockB: blockB, blockL: blockL, blockR: blockR}, loopOptions, function(updated) {
 		_.each(connections, function(connection) {
 			connection.send(JSON.stringify(updated));
 		});

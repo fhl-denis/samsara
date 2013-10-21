@@ -1,9 +1,9 @@
 var entity = require('./entity.js');
 var _ = require('underscore');
 
-var Block = function() {
+var Block = function(x, y, w, h) {
 	this.objectType = "Block";
-	this.bb = new entity.BoundingBox(0, 290, 800, 10);
+	this.bb = new entity.BoundingBox(x, y, w, h);
 	this.collisionInfo = new entity.CollisionInfo('hard', {});
 };
 
